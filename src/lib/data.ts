@@ -13,33 +13,36 @@ const KEYS = {
 
 const seedProducts: Product[] = [
   // Whisky
-  { id: 'p1', name: 'Macallan 18 Year Old', category: 'Whisky', description: 'A legendary single malt whisky matured exclusively in sherry oak casks for 18 years. Rich, complex, and impeccably balanced.', status: 'in-stock', image: '', createdAt: '2025-01-15', updatedAt: '2025-03-20' },
-  { id: 'p2', name: 'Glenfiddich 21 Year Old', category: 'Whisky', description: 'Aged for 21 years and finished in Caribbean rum casks, delivering a rich and sweet character.', status: 'in-stock', image: '', createdAt: '2025-01-20', updatedAt: '2025-03-18' },
-  { id: 'p3', name: 'Lagavulin 16 Year Old', category: 'Whisky', description: 'An intensely smoky Islay single malt with profound depth and maritime character.', status: 'limited', image: '', createdAt: '2025-02-01', updatedAt: '2025-03-15' },
-  { id: 'p4', name: 'Yamazaki 12 Year Old', category: 'Whisky', description: "Japan's most awarded single malt, with notes of peach, pineapple, and vanilla.", status: 'in-stock', image: '', createdAt: '2025-02-05', updatedAt: '2025-03-10' },
-  { id: 'p5', name: "Jack Daniel's Sinatra Select", category: 'Whisky', description: 'A premium expression with bold character and a smooth, refined finish.', status: 'in-stock', image: '', createdAt: '2025-02-10', updatedAt: '2025-03-08' },
-  { id: 'p6', name: 'Hibiki Japanese Harmony', category: 'Whisky', description: 'A symphony of Japanese craftsmanship, blending malt and grain whiskies in perfect harmony.', status: 'limited', image: '', createdAt: '2025-02-12', updatedAt: '2025-03-05' },
+  { id: 'p1', name: 'Macallan 18 Year Old', category: 'Whisky', description: 'A legendary single malt whisky matured exclusively in sherry oak casks for 18 years. Rich, complex, and impeccably balanced.', price: 0, status: 'in-stock', image: '', createdAt: '2025-01-15', updatedAt: '2025-03-20' },
+  { id: 'p2', name: 'Glenfiddich 21 Year Old', category: 'Whisky', description: 'Aged for 21 years and finished in Caribbean rum casks, delivering a rich and sweet character.', price: 0, status: 'in-stock', image: '', createdAt: '2025-01-20', updatedAt: '2025-03-18' },
+  { id: 'p3', name: 'Lagavulin 16 Year Old', category: 'Whisky', description: 'An intensely smoky Islay single malt with profound depth and maritime character.', price: 0, status: 'limited', image: '', createdAt: '2025-02-01', updatedAt: '2025-03-15' },
+  { id: 'p4', name: 'Yamazaki 12 Year Old', category: 'Whisky', description: "Japan's most awarded single malt, with notes of peach, pineapple, and vanilla.", price: 0, status: 'in-stock', image: '', createdAt: '2025-02-05', updatedAt: '2025-03-10' },
+  { id: 'p5', name: "Jack Daniel's Sinatra Select", category: 'Whisky', description: 'A premium expression with bold character and a smooth, refined finish.', price: 0, status: 'in-stock', image: '', createdAt: '2025-02-10', updatedAt: '2025-03-08' },
+  { id: 'p6', name: 'Hibiki Japanese Harmony', category: 'Whisky', description: 'A symphony of Japanese craftsmanship, blending malt and grain whiskies in perfect harmony.', price: 0, status: 'limited', image: '', createdAt: '2025-02-12', updatedAt: '2025-03-05' },
+
   // Wines
-  { id: 'p7', name: 'Chateau Margaux 2015', category: 'Wines', description: "One of Bordeaux's most prestigious first growths, offering extraordinary elegance and complexity.", status: 'limited', image: '', createdAt: '2025-01-10', updatedAt: '2025-03-22' },
-  { id: 'p8', name: 'Opus One 2018', category: 'Wines', description: 'A legendary California-Napa Valley Bordeaux blend of exceptional depth and refinement.', status: 'in-stock', image: '', createdAt: '2025-01-18', updatedAt: '2025-03-20' },
-  { id: 'p9', name: 'Tignanello 2019', category: 'Wines', description: 'Tuscany\'s iconic Super Tuscan, blending Sangiovese with Cabernet Sauvignon and Franc.', status: 'in-stock', image: '', createdAt: '2025-01-25', updatedAt: '2025-03-18' },
-  { id: 'p10', name: 'Cloudy Bay Sauvignon Blanc', category: 'Wines', description: "New Zealand's most celebrated Sauvignon Blanc, vibrant and refreshing.", status: 'in-stock', image: '', createdAt: '2025-02-01', updatedAt: '2025-03-15' },
-  { id: 'p11', name: 'Dom Perignon 2012', category: 'Wines', description: "The pinnacle of Champagne, representing the finest expression of Moet & Chandon's craft.", status: 'in-stock', image: '', createdAt: '2025-02-08', updatedAt: '2025-03-12' },
-  { id: 'p12', name: "Penfolds Grange 2017", category: 'Wines', description: "Australia's most iconic wine, a powerful Shiraz of immense depth and longevity.", status: 'limited', image: '', createdAt: '2025-02-14', updatedAt: '2025-03-10' },
+  { id: 'p7', name: 'Chateau Margaux 2015', category: 'Wines', description: "One of Bordeaux's most prestigious first growths, offering extraordinary elegance and complexity.", price: 0, status: 'limited', image: '', createdAt: '2025-01-10', updatedAt: '2025-03-22' },
+  { id: 'p8', name: 'Opus One 2018', category: 'Wines', description: 'A legendary California-Napa Valley Bordeaux blend of exceptional depth and refinement.', price: 0, status: 'in-stock', image: '', createdAt: '2025-01-18', updatedAt: '2025-03-20' },
+  { id: 'p9', name: 'Tignanello 2019', category: 'Wines', description: "Tuscany's iconic Super Tuscan, blending Sangiovese with Cabernet Sauvignon and Franc.", price: 0, status: 'in-stock', image: '', createdAt: '2025-01-25', updatedAt: '2025-03-18' },
+  { id: 'p10', name: 'Cloudy Bay Sauvignon Blanc', category: 'Wines', description: "New Zealand's most celebrated Sauvignon Blanc, vibrant and refreshing.", price: 0, status: 'in-stock', image: '', createdAt: '2025-02-01', updatedAt: '2025-03-15' },
+  { id: 'p11', name: 'Dom Perignon 2012', category: 'Wines', description: "The pinnacle of Champagne, representing the finest expression of Moet & Chandon's craft.", price: 0, status: 'in-stock', image: '', createdAt: '2025-02-08', updatedAt: '2025-03-12' },
+  { id: 'p12', name: "Penfolds Grange 2017", category: 'Wines', description: "Australia's most iconic wine, a powerful Shiraz of immense depth and longevity.", price: 0, status: 'limited', image: '', createdAt: '2025-02-14', updatedAt: '2025-03-10' },
+
   // Spirits
-  { id: 'p13', name: 'Grey Goose Vodka', category: 'Spirits', description: "France's premium vodka, crafted from the finest soft winter wheat and spring water.", status: 'in-stock', image: '', createdAt: '2025-01-12', updatedAt: '2025-03-25' },
-  { id: 'p14', name: "Patron Anejo Tequila", category: 'Spirits', description: 'A premium aged tequila with rich, complex flavors of oak, vanilla, and raisins.', status: 'in-stock', image: '', createdAt: '2025-01-22', updatedAt: '2025-03-22' },
-  { id: 'p15', name: "Hendrick's Gin", category: 'Spirits', description: 'A curiously crafted Scottish gin infused with rose and cucumber for a unique taste.', status: 'in-stock', image: '', createdAt: '2025-02-02', updatedAt: '2025-03-20' },
-  { id: 'p16', name: 'Cointreau Liqueur', category: 'Spirits', description: "The world's premier triple sec, essential for crafting the finest cocktails.", status: 'in-stock', image: '', createdAt: '2025-02-06', updatedAt: '2025-03-18' },
-  { id: 'p17', name: 'Grand Marnier Cordon Rouge', category: 'Spirits', description: 'A refined blend of cognac and bitter orange liqueur, luxurious and complex.', status: 'in-stock', image: '', createdAt: '2025-02-11', updatedAt: '2025-03-15' },
-  { id: 'p18', name: 'Bacardi Reserva Limitada', category: 'Spirits', description: "Bacardi's most prestigious rum, aged in oak barrels for a deep, smooth character.", status: 'limited', image: '', createdAt: '2025-02-16', updatedAt: '2025-03-12' },
+  { id: 'p13', name: 'Grey Goose Vodka', category: 'Spirits', description: "France's premium vodka, crafted from the finest soft winter wheat and spring water.", price: 0, status: 'in-stock', image: '', createdAt: '2025-01-12', updatedAt: '2025-03-25' },
+  { id: 'p14', name: "Patron Anejo Tequila", category: 'Spirits', description: 'A premium aged tequila with rich, complex flavors of oak, vanilla, and raisins.', price: 0, status: 'in-stock', image: '', createdAt: '2025-01-22', updatedAt: '2025-03-22' },
+  { id: 'p15', name: "Hendrick's Gin", category: 'Spirits', description: 'A curiously crafted Scottish gin infused with rose and cucumber for a unique taste.', price: 0, status: 'in-stock', image: '', createdAt: '2025-02-02', updatedAt: '2025-03-20' },
+  { id: 'p16', name: 'Cointreau Liqueur', category: 'Spirits', description: "The world's premier triple sec, essential for crafting the finest cocktails.", price: 0, status: 'in-stock', image: '', createdAt: '2025-02-06', updatedAt: '2025-03-18' },
+  { id: 'p17', name: 'Grand Marnier Cordon Rouge', category: 'Spirits', description: 'A refined blend of cognac and bitter orange liqueur, luxurious and complex.', price: 0, status: 'in-stock', image: '', createdAt: '2025-02-11', updatedAt: '2025-03-15' },
+  { id: 'p18', name: 'Bacardi Reserva Limitada', category: 'Spirits', description: "Bacardi's most prestigious rum, aged in oak barrels for a deep, smooth character.", price: 0, status: 'limited', image: '', createdAt: '2025-02-16', updatedAt: '2025-03-12' },
+
   // Soft Drinks
-  { id: 'p19', name: 'Perrier Sparkling Water', category: 'Soft Drinks', description: 'The iconic French sparkling mineral water, naturally carbonated at the source.', status: 'in-stock', image: '', createdAt: '2025-01-08', updatedAt: '2025-03-28' },
-  { id: 'p20', name: 'San Pellegrino Sparkling', category: 'Soft Drinks', description: "Italy's finest sparkling natural mineral water, served at the world's best tables.", status: 'in-stock', image: '', createdAt: '2025-01-16', updatedAt: '2025-03-25' },
-  { id: 'p21', name: 'Fever-Tree Tonic Water', category: 'Soft Drinks', description: 'The world\'s leading premium mixer, crafted with naturally sourced quinine.', status: 'in-stock', image: '', createdAt: '2025-01-28', updatedAt: '2025-03-22' },
-  { id: 'p22', name: 'Monin Syrups Collection', category: 'Soft Drinks', description: 'French premium syrups in over 100 flavors for crafting exceptional beverages.', status: 'in-stock', image: '', createdAt: '2025-02-03', updatedAt: '2025-03-20' },
-  { id: 'p23', name: 'Red Bull Energy Drink', category: 'Soft Drinks', description: 'The global leader in energy drinks, delivering wings since 1987.', status: 'in-stock', image: '', createdAt: '2025-02-09', updatedAt: '2025-03-18' },
-  { id: 'p24', name: 'Fentimans Botanical Drinks', category: 'Soft Drinks', description: 'Botanically brewed beverages crafted with natural ingredients and time-honored methods.', status: 'in-stock', image: '', createdAt: '2025-02-13', updatedAt: '2025-03-15' },
+  { id: 'p19', name: 'Perrier Sparkling Water', category: 'Soft Drinks', description: 'The iconic French sparkling mineral water, naturally carbonated at the source.', price: 0, status: 'in-stock', image: '', createdAt: '2025-01-08', updatedAt: '2025-03-28' },
+  { id: 'p20', name: 'San Pellegrino Sparkling', category: 'Soft Drinks', description: "Italy's finest sparkling natural mineral water, served at the world's best tables.", price: 0, status: 'in-stock', image: '', createdAt: '2025-01-16', updatedAt: '2025-03-25' },
+  { id: 'p21', name: 'Fever-Tree Tonic Water', category: 'Soft Drinks', description: "The world's leading premium mixer, crafted with naturally sourced quinine.", price: 0, status: 'in-stock', image: '', createdAt: '2025-01-28', updatedAt: '2025-03-22' },
+  { id: 'p22', name: 'Monin Syrups Collection', category: 'Soft Drinks', description: 'French premium syrups in over 100 flavors for crafting exceptional beverages.', price: 0, status: 'in-stock', image: '', createdAt: '2025-02-03', updatedAt: '2025-03-20' },
+  { id: 'p23', name: 'Red Bull Energy Drink', category: 'Soft Drinks', description: 'The global leader in energy drinks, delivering wings since 1987.', price: 0, status: 'in-stock', image: '', createdAt: '2025-02-09', updatedAt: '2025-03-18' },
+  { id: 'p24', name: 'Fentimans Botanical Drinks', category: 'Soft Drinks', description: 'Botanically brewed beverages crafted with natural ingredients and time-honored methods.', price: 0, status: 'in-stock', image: '', createdAt: '2025-02-13', updatedAt: '2025-03-15' },
 ];
 
 const seedCategories: Category[] = [
@@ -49,8 +52,7 @@ const seedCategories: Category[] = [
   { id: 'c4', name: 'Soft Drinks', description: 'Artisanal mixers, sparkling waters, energy drinks, and premium non-alcoholic beverages.' },
 ];
 
-const seedMessages: Message[] = [
-];
+const seedMessages: Message[] = [];
 
 const seedHomeContent: HomeContent = {
   hero: {
@@ -284,7 +286,7 @@ export function refreshToken(): void {
     const decoded = JSON.parse(atob(token));
     decoded.exp = Date.now() + 24 * 60 * 60 * 1000;
     localStorage.setItem(KEYS.token, btoa(JSON.stringify(decoded)));
-  } catch { /* ignore */ }
+  } catch {}
 }
 
 // Stats
