@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&family=Poppins:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --sb-charcoal: #1C1C1E;
+    --sb-white: #FFFFFF;
+    --sb-warm-gray: #F2F0EB;
+    --sb-muted: #6B6B6E;
+    --sb-pale: #D1D1D6;
+    --sb-soft: #E5E5EA;
+    --sb-gold: #D4AF37;
+    --sb-gold-light: #E8C547;
+    --sb-success: #34C759;
+    --sb-warning: #FF9F0A;
+    --sb-danger: #FF3B30;
+    --sb-admin-bg: #F5F5F7;
+    --sb-admin-muted: #8E8E93;
+
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    color: var(--sb-charcoal);
+    background-color: var(--sb-white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .font-body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+
+  .text-gold {
+    color: var(--sb-gold);
+  }
+
+  .bg-gold {
+    background-color: var(--sb-gold);
+  }
+
+  .border-gold {
+    border-color: var(--sb-gold);
+  }
+
+  .bg-charcoal {
+    background-color: var(--sb-charcoal);
+  }
+
+  .text-charcoal {
+    color: var(--sb-charcoal);
+  }
+
+  .bg-warm-gray {
+    background-color: var(--sb-warm-gray);
+  }
+
+  .text-muted-sb {
+    color: var(--sb-muted);
+  }
+
+  .border-pale {
+    border-color: var(--sb-pale);
+  }
+
+  .border-soft {
+    border-color: var(--sb-soft);
+  }
+
+  .writing-vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  .clip-reveal {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  .clip-reveal-visible {
+    clip-path: inset(0 0 0% 0);
+  }
+}
