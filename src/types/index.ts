@@ -5,9 +5,16 @@ export interface Product {
   name: string;
   category: string;
   description: string;
+
   price: number;
+
+  // ✅ make optional so admin + old data won't break build
+  oldPrice?: number;
+  discount?: number;
+
   status: ProductStatus;
   image: string;
+
   createdAt: string;
   updatedAt: string;
 }
