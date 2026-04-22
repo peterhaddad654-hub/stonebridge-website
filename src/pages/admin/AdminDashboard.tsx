@@ -4,13 +4,24 @@ import { Package, Tags, Mail, CheckCircle } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { stats, messages } = useData();
-  const recentMessages = messages.slice(0, 5);
+
+  // ✅ FIX: fallback to prevent crash
+  const safeStats = stats || {
+    totalProducts: 0,
+    totalCategories: 0,
+    newMessages: 0,
+    inStockProducts: 0,
+  };
+
+  const safeMessages = messages || [];
+
+  const recentMessages = safeMessages.slice(0, 5);
 
   const statCards = [
-    { icon: Package, value: stats.totalProducts, label: 'Total Products', trend: `+${stats.totalProducts - 21} this month` },
-    { icon: Tags, value: stats.totalCategories, label: 'Categories' },
-    { icon: Mail, value: stats.newMessages, label: 'New Messages', alert: stats.newMessages > 0 },
-    { icon: CheckCircle, value: stats.inStockProducts, label: 'In Stock', color: '#34C759' },
+    { icon: Package, value: safeStats.totalProducts, label: 'Total Products', trend: `+${safeStats.totalProducts - 21} this month` },
+    { icon: Tags, value: safeStats.totalCategories, label: 'Categories' },
+    { icon: Mail, value: safeStats.newMessages, label: 'New Messages', alert: safeStats.newMessages > 0 },
+    { icon: CheckCircle, value: safeStats.inStockProducts, label: 'In Stock', color: '#34C759' },
   ];
 
   return (

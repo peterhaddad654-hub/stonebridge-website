@@ -51,20 +51,20 @@ export default function AdminProducts() {
     setModalOpen(true);
   };
 
- const openEdit = (product: Product) => {
-  setForm({
-    name: product.name,
-    category: product.category,
-    description: product.description,
-    status: product.status,
-    image: product.image,
-    price: product.price ?? 0,
-  });
-  setImagePreview(product.image);
-  setEditingId(product.id);
-  setErrors({});
-  setModalOpen(true);
-};
+  const openEdit = (product: Product) => {
+    setForm({
+      name: product.name,
+      category: product.category,
+      description: product.description,
+      status: product.status,
+      image: product.image,
+      price: product.price ?? 0,
+    });
+    setImagePreview(product.image);
+    setEditingId(product.id);
+    setErrors({});
+    setModalOpen(true);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -82,45 +82,43 @@ export default function AdminProducts() {
     reader.readAsDataURL(file);
   };
 
-const validate = () => {
-  const e: Record<string, string> = {};
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!form.name.trim()) e.name = 'Product name is required';
+    if (!form.category) e.category = 'Category is required';
+    if (form.price === undefined || form.price === null || isNaN(form.price) || form.price < 0) {
+      e.price = 'Valid price is required';
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
-  if (!form.name.trim()) e.name = 'Product name is required';
-  if (!form.category) e.category = 'Category is required';
+  const handleSave = async () => {
+    if (!validate()) return;
+    try {
+      const dataToSave = { ...form, price: Number(form.price) };
+      if (editingId) {
+        await editProduct(editingId, dataToSave);
+        toast.success('Product updated');
+      } else {
+        await createProduct(dataToSave);
+        toast.success('Product created');
+      }
+      setModalOpen(false);
+    } catch (err) {
+      toast.error('Could not save product');
+    }
+  };
 
-  if (
-    form.price === undefined ||
-    form.price === null ||
-    form.price === ('' as any) ||
-    isNaN(form.price) ||
-    form.price < 0
-  ) {
-    e.price = 'Valid price is required';
-  }
-
-  setErrors(e);
-  return Object.keys(e).length === 0;
-};
-
- const handleSave = () => {
-  if (!validate()) return;
-
-  if (editingId) {
-    editProduct(editingId, { ...form });
-    toast.success('Product updated');
-  } else {
-    createProduct({ ...form });
-    toast.success('Product created');
-  }
-
-  setModalOpen(false);
-};
-
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId) {
-      removeProduct(deleteId);
-      toast.success('Product deleted');
-      setDeleteId(null);
+      try {
+        await removeProduct(deleteId);
+        toast.success('Product deleted');
+        setDeleteId(null);
+      } catch (err) {
+        toast.error('Error deleting product');
+      }
     }
   };
 
@@ -210,9 +208,7 @@ const validate = () => {
                 </td>
                 <td className="px-5 py-4 font-display text-sm font-medium text-[#1C1C1E]">{product.name}</td>
                 <td className="px-5 py-4 font-body text-[13px] text-[#8E8E93] uppercase">{product.category}</td>
-                <td className="px-5 py-4 font-body text-[13px] text-[#1C1C1E]">
-  ${product.price ?? 0}
-</td>
+                <td className="px-5 py-4 font-body text-[13px] text-[#1C1C1E]">${product.price ?? 0}</td>
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusConfig[product.status].color }} />
@@ -258,7 +254,6 @@ const validate = () => {
               </button>
             </div>
             <div className="p-6 space-y-5">
-              {/* Image Upload */}
               <div>
                 <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">
                   Product Image
@@ -274,12 +269,7 @@ const validate = () => {
                       <span className="font-body text-xs text-[#8E8E93] mt-1">PNG, JPG up to 5MB</span>
                     </label>
                   )}
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg"
-                    onChange={handleImageUpload}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                  />
+                  <input type="file" accept="image/png,image/jpeg" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                 </div>
                 {imagePreview && (
                   <label className="font-body text-[13px] text-[#D4AF37] cursor-pointer mt-2 inline-block hover:underline">
@@ -288,12 +278,8 @@ const validate = () => {
                   </label>
                 )}
               </div>
-
-              {/* Name */}
               <div>
-                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">
-                  Product Name *
-                </label>
+                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">Product Name *</label>
                 <input
                   type="text"
                   value={form.name}
@@ -303,12 +289,8 @@ const validate = () => {
                 />
                 {errors.name && <p className="font-body text-xs text-[#FF3B30] mt-1">{errors.name}</p>}
               </div>
-
-              {/* Category */}
               <div>
-                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">
-                  Category *
-                </label>
+                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">Category *</label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
@@ -319,39 +301,19 @@ const validate = () => {
                 </select>
                 {errors.category && <p className="font-body text-xs text-[#FF3B30] mt-1">{errors.category}</p>}
               </div>
-
-              {/* Price */}
-<div>
-  <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">
-    Price *
-  </label>
-
-  <input
-    type="number"
-    value={form.price}
-    onChange={(e) =>
-      setForm((prev) => ({
-        ...prev,
-        price: Number(e.target.value),
-      }))
-    }
-    placeholder="Enter price (USD)"
-    className={`w-full border ${
-      errors.price ? 'border-[#FF3B30]' : 'border-[#E5E5EA]'
-    } px-4 py-2.5 font-body text-sm focus:border-[#D4AF37] focus:outline-none transition-colors`}
-  />
-
-  {errors.price && (
-    <p className="font-body text-xs text-[#FF3B30] mt-1">
-      {errors.price}
-    </p>
-  )}
-</div>
-              {/* Description */}
               <div>
-                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">
-                  Description
-                </label>
+                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">Price *</label>
+                <input
+                  type="number"
+                  value={form.price}
+                  onChange={(e) => setForm((prev) => ({ ...prev, price: Number(e.target.value) }))}
+                  placeholder="Enter price (USD)"
+                  className={`w-full border ${errors.price ? 'border-[#FF3B30]' : 'border-[#E5E5EA]'} px-4 py-2.5 font-body text-sm focus:border-[#D4AF37] focus:outline-none transition-colors`}
+                />
+                {errors.price && <p className="font-body text-xs text-[#FF3B30] mt-1">{errors.price}</p>}
+              </div>
+              <div>
+                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-2 block">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
@@ -361,12 +323,8 @@ const validate = () => {
                   className="w-full border border-[#E5E5EA] px-4 py-2.5 font-body text-sm focus:border-[#D4AF37] focus:outline-none transition-colors resize-none"
                 />
               </div>
-
-              {/* Status */}
               <div>
-                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-3 block">
-                  Inventory Status *
-                </label>
+                <label className="font-body text-xs font-medium uppercase tracking-[0.05em] text-[#8E8E93] mb-3 block">Inventory Status *</label>
                 <div className="flex gap-6">
                   {(['in-stock', 'limited', 'out-of-stock'] as ProductStatus[]).map((s) => (
                     <label key={s} className="flex items-center gap-2 cursor-pointer">
@@ -385,18 +343,8 @@ const validate = () => {
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 p-5 border-t border-[#E5E5EA]">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="font-body text-[13px] border border-[#E5E5EA] text-[#1C1C1E] px-6 py-2.5 hover:border-[#1C1C1E] transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="font-body text-[13px] bg-[#D4AF37] text-[#1C1C1E] px-6 py-2.5 hover:bg-[#E8C547] transition-colors"
-              >
-                Save Product
-              </button>
+              <button onClick={() => setModalOpen(false)} className="font-body text-[13px] border border-[#E5E5EA] text-[#1C1C1E] px-6 py-2.5 hover:border-[#1C1C1E] transition-colors">Cancel</button>
+              <button onClick={handleSave} className="font-body text-[13px] bg-[#D4AF37] text-[#1C1C1E] px-6 py-2.5 hover:bg-[#E8C547] transition-colors">Save Product</button>
             </div>
           </div>
         </div>
@@ -429,12 +377,7 @@ const validate = () => {
               </div>
             </div>
             <div className="p-5 border-t border-[#E5E5EA]">
-              <button
-                onClick={() => setViewProduct(null)}
-                className="w-full font-body text-[13px] border border-[#E5E5EA] text-[#1C1C1E] py-2.5 hover:border-[#1C1C1E] transition-colors"
-              >
-                Close
-              </button>
+              <button onClick={() => setViewProduct(null)} className="w-full font-body text-[13px] border border-[#E5E5EA] text-[#1C1C1E] py-2.5 hover:border-[#1C1C1E] transition-colors">Close</button>
             </div>
           </div>
         </div>
@@ -446,22 +389,10 @@ const validate = () => {
           <div className="bg-white w-full max-w-[400px] p-8 text-center">
             <Trash2 className="w-8 h-8 text-[#FF9F0A] mx-auto" />
             <h3 className="font-display text-lg font-medium text-[#1C1C1E] mt-4">Delete Product?</h3>
-            <p className="font-body text-sm text-[#8E8E93] mt-2">
-              Are you sure you want to delete this product? This action cannot be undone.
-            </p>
+            <p className="font-body text-sm text-[#8E8E93] mt-2">Are you sure? This action cannot be undone.</p>
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setDeleteId(null)}
-                className="flex-1 font-body text-[13px] border border-[#E5E5EA] text-[#1C1C1E] py-2.5 hover:border-[#1C1C1E] transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 font-body text-[13px] bg-[#FF3B30] text-white py-2.5 hover:bg-[#E02E24] transition-colors"
-              >
-                Delete
-              </button>
+              <button onClick={() => setDeleteId(null)} className="flex-1 font-body text-[13px] border border-[#E5E5EA] text-[#1C1C1E] py-2.5 hover:border-[#1C1C1E] transition-colors">Cancel</button>
+              <button onClick={handleDelete} className="flex-1 font-body text-[13px] bg-[#FF3B30] text-white py-2.5 hover:bg-[#E02E24] transition-colors">Delete</button>
             </div>
           </div>
         </div>

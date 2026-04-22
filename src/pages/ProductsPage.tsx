@@ -99,7 +99,7 @@ export default function ProductsPage() {
                 {/* IMAGE */}
                 <Link
                   to={`/product/${product.id}`}
-                  className="relative h-40 md:h-48 flex items-center justify-center bg-white rounded-xl mb-4 p-4 overflow-hidden"
+                  className="relative h-40 md:h-48 flex items-center justify-center bg-transparent rounded-xl mb-4 p-4 overflow-hidden"
                 >
 
                   {/* SAFE IMAGE FIX */}

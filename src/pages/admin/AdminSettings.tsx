@@ -4,7 +4,9 @@ import { toast } from 'sonner';
 
 export default function AdminSettings() {
   const { settings, editSettings } = useData();
-  const [siteForm, setSiteForm] = useState({ ...settings });
+  const [siteForm, setSiteForm] = useState<Record<string, any>>(() => ({
+    ...(settings ?? {}),
+  }));
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [pwError, setPwError] = useState('');

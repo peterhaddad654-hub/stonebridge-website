@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import type { Product, Category, Message, HomeContent, SiteSettings } from '@/types';
+import { createContext, useContext, useEffect, useState } from 'react';
 import {
   getProducts,
   addProduct,
@@ -11,191 +10,161 @@ import {
   deleteCategory,
   getMessages,
   addMessage,
-  markMessageAsRead,
-  markAllMessagesAsRead,
-  deleteMessage,
   getHomeContent,
   updateHomeContent,
   getSettings,
   updateSettings,
-  getStats,
-} from '@/lib/data';
+} from '@/lib/firebaseapi';
 
-interface DataContextType {
-  products: Product[];
-  categories: Category[];
-  messages: Message[];
-  homeContent: HomeContent;
-  settings: SiteSettings;
-  stats: ReturnType<typeof getStats>;
-  refresh: () => void;
-
-  // Product actions
-  createProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  editProduct: (id: string, updates: Partial<Product>) => void;
-  removeProduct: (id: string) => void;
-
-  // Category actions
-  createCategory: (category: Omit<Category, 'id'>) => void;
-  editCategory: (id: string, updates: Partial<Category>) => void;
-  removeCategory: (id: string) => void;
-
-  // Message actions
-  createMessage: (message: Omit<Message, 'id' | 'date' | 'status'>) => void;
-  readMessage: (id: string) => void;
-  readAllMessages: () => void;
-  removeMessage: (id: string) => void;
-
-  // Home content
-  editHomeContent: (updates: Partial<HomeContent>) => void;
-
-  // Settings
-  editSettings: (updates: Partial<SiteSettings>) => void;
-}
-
-const DataContext = createContext<DataContextType | null>(null);
+const DataContext = createContext<any>({});
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [data, setData] = useState(() => ({
-    products: getProducts(),
-    categories: getCategories(),
-    messages: getMessages(),
-    homeContent: getHomeContent(),
-    settings: getSettings(),
-    stats: getStats(),
-  }));
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [homeContent, setHomeContent] = useState<any>(null);
+  const [settings, setSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    setData({
-      products: getProducts(),
-      categories: getCategories(),
-      messages: getMessages(),
-      homeContent: getHomeContent(),
-      settings: getSettings(),
-      stats: getStats(),
-    });
-  }, []);
+  // -------------------------
+  // SAFE LOAD (NO CRASH)
+  // -------------------------
+  const loadData = async () => {
+    try {
+      setLoading(true);
 
-  // 🔥 FIXED PRODUCT HANDLING (price-safe)
-  const createProduct = useCallback(
-    (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-      const safeProduct: typeof product = {
-        ...product,
-        price: Number(product.price ?? 0),
-      };
+      const [p, c, m, hc, s] = await Promise.all([
+        getProducts().catch(() => []),
+        getCategories().catch(() => []),
+        getMessages().catch(() => []),
+        getHomeContent().catch(() => null),
+        getSettings().catch(() => null),
+      ]);
 
-      addProduct(safeProduct);
-      refresh();
-    },
-    [refresh]
-  );
-
-  const editProduct = useCallback(
-    (id: string, updates: Partial<Product>) => {
-      updateProduct(id, {
-        ...updates,
-        price: updates.price !== undefined ? Number(updates.price) : undefined,
+      setProducts(p ?? []);
+      setCategories(c ?? []);
+      setMessages(m ?? []);
+      setHomeContent(hc ?? {
+        hero: {},
+        featuredProducts: [],
+        stats: {},
+        testimonials: [],
       });
 
-      refresh();
-    },
-    [refresh]
-  );
+      setSettings(s ?? {});
+    } catch (err) {
+      console.error('Data load error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const removeProduct = useCallback(
-    (id: string) => {
-      deleteProduct(id);
-      refresh();
-    },
-    [refresh]
-  );
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const createCategory = useCallback(
-    (category: Omit<Category, 'id'>) => {
-      addCategory(category);
-      refresh();
-    },
-    [refresh]
-  );
+  // -------------------------
+  // PRODUCTS
+  // -------------------------
+  const createProduct = async (data: any) => {
+    const res = await addProduct(data);
+    await loadData();
+    return res;
+  };
 
-  const editCategory = useCallback(
-    (id: string, updates: Partial<Category>) => {
-      updateCategory(id, updates);
-      refresh();
-    },
-    [refresh]
-  );
+  const editProduct = async (id: string, data: any) => {
+    const res = await updateProduct(id, data);
+    await loadData();
+    return res;
+  };
 
-  const removeCategory = useCallback(
-    (id: string) => {
-      deleteCategory(id);
-      refresh();
-    },
-    [refresh]
-  );
+  const removeProduct = async (id: string) => {
+    const res = await deleteProduct(id);
+    await loadData();
+    return res;
+  };
 
-  const createMessage = useCallback(
-    (message: Omit<Message, 'id' | 'date' | 'status'>) => {
-      addMessage(message);
-      refresh();
-    },
-    [refresh]
-  );
+  // -------------------------
+  // CATEGORIES
+  // -------------------------
+  const createCategory = async (data: any) => {
+    const res = await addCategory(data);
+    await loadData();
+    return res;
+  };
 
-  const readMessage = useCallback(
-    (id: string) => {
-      markMessageAsRead(id);
-      refresh();
-    },
-    [refresh]
-  );
+  const editCategory = async (id: string, data: any) => {
+    const res = await updateCategory(id, data);
+    await loadData();
+    return res;
+  };
 
-  const readAllMessages = useCallback(() => {
-    markAllMessagesAsRead();
-    refresh();
-  }, [refresh]);
+  const removeCategory = async (id: string) => {
+    const res = await deleteCategory(id);
+    await loadData();
+    return res;
+  };
 
-  const removeMessage = useCallback(
-    (id: string) => {
-      deleteMessage(id);
-      refresh();
-    },
-    [refresh]
-  );
+  // -------------------------
+  // MESSAGES
+  // -------------------------
+  const createMessage = async (data: any) => {
+    const res = await addMessage(data);
+    await loadData();
+    return res;
+  };
 
-  const editHomeContent = useCallback(
-    (updates: Partial<HomeContent>) => {
-      updateHomeContent(updates);
-      refresh();
-    },
-    [refresh]
-  );
+  // -------------------------
+  // HOME CONTENT
+  // -------------------------
+  const editHomeContent = async (data: any) => {
+    const res = await updateHomeContent(data);
+    await loadData();
+    return res;
+  };
 
-  const editSettings = useCallback(
-    (updates: Partial<SiteSettings>) => {
-      updateSettings(updates);
-      refresh();
-    },
-    [refresh]
-  );
+  // -------------------------
+  // SETTINGS
+  // -------------------------
+  const editSettings = async (data: any) => {
+    const res = await updateSettings(data);
+    await loadData();
+    return res;
+  };
+
+  // -------------------------
+  // SAFE STATS (NO CRASH)
+  // -------------------------
+  const stats = {
+    totalProducts: products?.length ?? 0,
+    totalCategories: categories?.length ?? 0,
+    newMessages: messages?.filter((m: any) => m.status === 'new')?.length ?? 0,
+  };
 
   return (
     <DataContext.Provider
       value={{
-        ...data,
-        refresh,
+        products,
+        categories,
+        messages,
+        homeContent,
+        settings,
+        loading,
+
         createProduct,
         editProduct,
         removeProduct,
+
         createCategory,
         editCategory,
         removeCategory,
+
         createMessage,
-        readMessage,
-        readAllMessages,
-        removeMessage,
+
         editHomeContent,
         editSettings,
+
+        stats,
       }}
     >
       {children}
@@ -203,8 +172,4 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useData = () => {
-  const ctx = useContext(DataContext);
-  if (!ctx) throw new Error('useData must be used within DataProvider');
-  return ctx;
-};
+export const useData = () => useContext(DataContext);

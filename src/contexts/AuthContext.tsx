@@ -1,46 +1,62 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { isAuthenticated, login as doLogin, logout as doLogout, refreshToken } from '@/lib/data';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-interface AuthContextType {
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
+
+import type { User } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+
+type AuthContextType = {
+  user: User | null;
   isAuth: boolean;
-  login: (username: string, password: string) => boolean;
-  logout: () => void;
-}
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+};
 
-const AuthContext = createContext<AuthContextType>({
-  isAuth: false,
-  login: () => false,
-  logout: () => {},
-});
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuth, setIsAuth] = useState(() => isAuthenticated());
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuth, setIsAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // 🔥 LISTEN TO AUTH STATE
   useEffect(() => {
-    const check = () => setIsAuth(isAuthenticated());
-    check();
-    const interval = setInterval(check, 60000);
-    return () => clearInterval(interval);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setIsAuth(!!firebaseUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = useCallback((username: string, password: string) => {
-    const success = doLogin(username, password);
-    if (success) setIsAuth(true);
-    return success;
-  }, []);
+  // 🔥 LOGIN
+  const login = async (email: string, password: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
+  };
 
-  const logout = useCallback(() => {
-    doLogout();
-    setIsAuth(false);
-  }, []);
-
-  // Refresh token on navigation
-  useEffect(() => {
-    if (isAuth) refreshToken();
-  }, [isAuth]);
+  // 🔥 LOGOUT
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuth, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuth, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

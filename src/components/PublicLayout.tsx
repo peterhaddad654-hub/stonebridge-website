@@ -82,12 +82,7 @@ export default function PublicLayout() {
           {/* RIGHT SIDE ICONS */}
           <div className="flex items-center gap-3">
             <div className="hidden lg:flex items-center gap-3">
-              <Link
-                to="/admin/login"
-                className="font-body text-[12px] text-white/70 hover:text-white border border-white/30 hover:border-white/60 px-4 py-2 uppercase tracking-[0.08em]"
-              >
-                Login
-              </Link>
+            
 
               <a
                 href="https://wa.me/96179467530"
@@ -144,9 +139,7 @@ export default function PublicLayout() {
             
             <div className="mt-auto mb-12 flex flex-col gap-6">
               <div className="h-[1px] bg-white/10 w-full" />
-              <Link to="/admin/login" className="text-white/60 uppercase text-sm tracking-widest">
-                Admin Access
-              </Link>
+              
               <a 
                 href="https://wa.me/96179467530" 
                 className="text-[#D4AF37] uppercase text-sm tracking-widest"
