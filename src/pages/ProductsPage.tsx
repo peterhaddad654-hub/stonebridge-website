@@ -1,13 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useData } from '@/contexts/DataContext';
-import { useCart } from '@/contexts/CartContext';
+import { useData } from '../contexts/DataContext';
+import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
 import { Plus, Check } from 'lucide-react';
 
-const categories = ['All Products', 'Whisky', 'Wines', 'Spirits', 'Soft Drinks'];
-
 export default function ProductsPage() {
-  const { products } = useData();
+  const { products, categories } = useData();
   const { addToCart } = useCart();
 
   const [activeCategory, setActiveCategory] = useState('All Products');
@@ -54,15 +52,17 @@ export default function ProductsPage() {
 
             {/* CATEGORIES */}
             <div className="flex gap-4 overflow-x-auto no-scrollbar w-full md:w-auto border-b border-white/5 pb-2">
-              {categories.map((cat) => (
+              {categories.map((cat: any, index: number) => (
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
+                  key={cat?.id || cat?.name || index}
+                  onClick={() => setActiveCategory(cat?.name || cat)}
                   className={`text-[10px] uppercase tracking-wider whitespace-nowrap transition ${
-                    activeCategory === cat ? 'text-[#D4AF37]' : 'text-white/40'
+                    activeCategory === (cat?.name || cat)
+                      ? 'text-[#D4AF37]'
+                      : 'text-white/40'
                   }`}
                 >
-                  {cat}
+                  {cat?.name || cat}
                 </button>
               ))}
             </div>
@@ -102,7 +102,6 @@ export default function ProductsPage() {
                   className="relative h-40 md:h-48 flex items-center justify-center bg-transparent rounded-xl mb-4 p-4 overflow-hidden"
                 >
 
-                  {/* SAFE IMAGE FIX */}
                   {product.image ? (
                     <img
                       src={product.image}
@@ -115,7 +114,6 @@ export default function ProductsPage() {
                     </div>
                   )}
 
-                  {/* STATUS */}
                   {isOut && (
                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
                       <span className="text-white text-[10px] uppercase tracking-widest font-bold border border-white/40 px-3 py-1 rounded">
