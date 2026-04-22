@@ -45,6 +45,8 @@ export interface Testimonial {
 }
 
 export interface HomeContent {
+  /** Firestore document id when loaded from DB */
+  id?: string;
   hero: {
     enabled: boolean;
     brandName: string;
@@ -63,6 +65,8 @@ export interface HomeContent {
 }
 
 export interface SiteSettings {
+  /** Firestore document id when loaded from DB */
+  id?: string;
   companyName: string;
   contactEmail: string;
   contactPhone: string;

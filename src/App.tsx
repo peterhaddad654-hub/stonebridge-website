@@ -1,30 +1,29 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { DataProvider } from '@/contexts/DataContext';
-import { CartProvider } from '@/contexts/CartContext';
-import { Toaster } from '@/components/ui/sonner';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
+import { CartProvider } from './contexts/CartContext';
+import { Toaster } from './components/ui/sonner';
+import { auth } from './lib/firebase.ts';
+import PublicLayout from './components/PublicLayout';
 
-import PublicLayout from '@/components/PublicLayout';
+import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import ServicesPage from './pages/ServicesPage';
+import CartPage from './pages/CartPage';
 
-import HomePage from '@/pages/HomePage';
-import ProductsPage from '@/pages/ProductsPage';
-import ProductDetailsPage from '@/pages/ProductDetailsPage';
-import AboutPage from '@/pages/AboutPage';
-import ContactPage from '@/pages/ContactPage';
-import ServicesPage from '@/pages/ServicesPage';
-import CartPage from '@/pages/CartPage';
-
-import AdminLogin from '@/pages/admin/AdminLogin';
-import AdminLayout from '@/components/admin/AdminLayout';
-import AdminDashboard from '@/pages/admin/AdminDashboard';
-import AdminProducts from '@/pages/admin/AdminProducts';
-import AdminCategories from '@/pages/admin/AdminCategories';
-import AdminMessages from '@/pages/admin/AdminMessages';
-import AdminHomeContent from '@/pages/admin/AdminHomeContent';
-import AdminSettings from '@/pages/admin/AdminSettings';
-
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminCategories from './pages/admin/AdminCategories';
+import AdminMessages from './pages/admin/AdminMessages';
+import AdminHomeContent from './pages/admin/AdminHomeContent';
+import AdminSettings from './pages/admin/AdminSettings';
 function AdminGuard({ children }: { children: React.ReactNode }) {
   const { isAuth } = useAuth();
   if (!isAuth) return <Navigate to="/admin/login" replace />;

@@ -4,9 +4,10 @@ import type {
   Message,
   HomeContent,
   SiteSettings,
-} from '@/types';
+} from '../types';
 
-import { db } from '@/lib/firebase';
+import { db } from '../lib/firebase';
+
 import {
   collection,
   getDocs,
@@ -170,9 +171,12 @@ export const getHomeContent = async (): Promise<HomeContent | null> => {
 
     const docSnap = snap.docs[0];
 
+    // ✅ FIXED: avoid TS error on id merge
+    const data = docSnap.data() as Omit<HomeContent, 'id'>;
+
     return {
       id: docSnap.id,
-      ...(docSnap.data() as HomeContent),
+      ...data,
     };
   } catch {
     return null;
@@ -215,9 +219,12 @@ export const getSettings = async (): Promise<SiteSettings | null> => {
 
     const docSnap = snap.docs[0];
 
+    // ✅ FIXED SAME WAY
+    const data = docSnap.data() as Omit<SiteSettings, 'id'>;
+
     return {
       id: docSnap.id,
-      ...(docSnap.data() as SiteSettings),
+      ...data,
     };
   } catch {
     return null;

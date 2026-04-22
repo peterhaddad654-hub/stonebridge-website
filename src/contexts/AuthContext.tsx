@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 
 import type { User } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth } from '../lib/firebase';
 
 type AuthContextType = {
   user: User | null;
