@@ -15,6 +15,11 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getCountFromServer,
+  limit,
+  orderBy,
+  query,
+  where,
 } from 'firebase/firestore';
 
 
@@ -24,8 +29,16 @@ import {
 
 export async function getProducts(): Promise<Product[]> {
   try {
-    const snap = await getDocs(collection(db, 'products'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() })) as Product[];
+    // Never fetch full products collection. Always paginate.
+    try {
+      const q1 = query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(24));
+      const snap1 = await getDocs(q1);
+      return snap1.docs.map(d => ({ id: d.id, ...d.data() })) as Product[];
+    } catch {
+      const q2 = query(collection(db, 'products'), orderBy('created_at', 'desc'), limit(24));
+      const snap2 = await getDocs(q2);
+      return snap2.docs.map(d => ({ id: d.id, ...d.data() })) as Product[];
+    }
   } catch (error) {
     console.error('getProducts error:', error);
     return [];
@@ -213,23 +226,26 @@ export async function updateSettings(updates: Partial<SiteSettings>) {
 
 export async function getStats() {
   try {
-    const [pSnap, cSnap, mSnap] = await Promise.all([
-      getDocs(collection(db, 'products')),
+    // Avoid full products collection fetch: use server-side counts.
+    const [pCount, inStockCount, limitedCount, outOfStockCount, cSnap, mSnap] = await Promise.all([
+      getCountFromServer(collection(db, 'products')),
+      getCountFromServer(query(collection(db, 'products'), where('status', '==', 'in-stock'))),
+      getCountFromServer(query(collection(db, 'products'), where('status', '==', 'limited'))),
+      getCountFromServer(query(collection(db, 'products'), where('status', '==', 'out-of-stock'))),
       getDocs(collection(db, 'categories')),
       getDocs(collection(db, 'messages')),
     ]);
 
-    const products = pSnap.docs.map(d => d.data() as any);
     const categories = cSnap.docs.map(d => d.data() as any);
     const messages = mSnap.docs.map(d => d.data() as any);
 
     return {
-      totalProducts: products.length,
+      totalProducts: pCount.data().count,
       totalCategories: categories.length,
       newMessages: messages.filter(m => m.status === 'new').length,
-      inStockProducts: products.filter(p => p.status === 'in-stock').length,
-      limitedProducts: products.filter(p => p.status === 'limited').length,
-      outOfStockProducts: products.filter(p => p.status === 'out-of-stock').length,
+      inStockProducts: inStockCount.data().count,
+      limitedProducts: limitedCount.data().count,
+      outOfStockProducts: outOfStockCount.data().count,
     };
   } catch (error) {
     console.error('getStats error:', error);

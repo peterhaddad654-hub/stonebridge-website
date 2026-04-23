@@ -1,17 +1,23 @@
 import { useData } from '@/contexts/DataContext';
 import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
 
 /* ───────────────── HOME ───────────────── */
 export default function HomePage() {
   const { products } = useData();
 
-  // 💎 TOP 10 MOST EXPENSIVE PRODUCTS
-  const featured = [...products]
-    .filter(p => p.price)
-    .sort((a, b) => (b.price || 0) - (a.price || 0))
-    .slice(0, 10);
+  // 💎 TOP 10 MOST EXPENSIVE PRODUCTS (MEMOIZED)
+  const featured = useMemo(() => {
+    return [...products]
+      .filter(p => p.price)
+      .sort((a, b) => (b.price || 0) - (a.price || 0))
+      .slice(0, 10);
+  }, [products]);
 
-  const discounted = products.filter(p => p.discount);
+  // 💸 DISCOUNTED PRODUCTS (MEMOIZED)
+  const discounted = useMemo(() => {
+    return products.filter(p => p.discount);
+  }, [products]);
 
   return (
     <div className="bg-[#0F0F10] text-white overflow-x-hidden">
@@ -47,8 +53,8 @@ function Hero() {
         <source src="/videos/home-hero.mp4" type="video/mp4" />
       </video>
 
-<div className="absolute inset-0 bg-black/40" />
-<div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/55 to-black/85" />
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/55 to-black/85" />
 
       <div className="relative z-10 px-4">
 
@@ -113,7 +119,6 @@ function FeaturedSection({ products }: any) {
         <div className="w-14 sm:w-24 h-[1px] bg-[#D4AF37]/40" />
       </div>
 
-      {/* GRID FIXED FOR MOBILE */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
 
         {products.map((p: any) => (
@@ -123,7 +128,6 @@ function FeaturedSection({ products }: any) {
             className="bg-[#111] border border-white/5 hover:border-[#D4AF37]/40 transition p-3 sm:p-6 group block"
           >
 
-            {/* IMAGE */}
             <div className="h-28 sm:h-44 md:h-64 flex items-center justify-center relative">
 
               <div className="absolute w-24 sm:w-40 h-24 sm:h-40 bg-[#D4AF37]/10 blur-3xl opacity-0 group-hover:opacity-100 transition" />
@@ -131,6 +135,9 @@ function FeaturedSection({ products }: any) {
               {p.image ? (
                 <img
                   src={p.image}
+                  loading="lazy"
+                  width="300"
+                  height="300"
                   className="h-full object-contain group-hover:scale-105 transition duration-500"
                 />
               ) : (
@@ -139,7 +146,6 @@ function FeaturedSection({ products }: any) {
 
             </div>
 
-            {/* TEXT */}
             <p className="text-[#D4AF37] text-[9px] sm:text-[11px] uppercase tracking-[0.2em] mt-3 sm:mt-5">
               {p.category}
             </p>
@@ -173,13 +179,19 @@ function DiscountSection({ products }: any) {
 
       <div className="flex justify-center gap-4 sm:gap-6 flex-wrap">
 
-        {products.map((p: any) => (
+        {products.slice(0, 10).map((p: any) => (
           <div
             key={p.id}
             className="bg-[#111] border border-white/10 p-4 sm:p-6 w-44 sm:w-64"
           >
 
-            <img src={p.image} className="h-28 sm:h-40 mx-auto object-contain" />
+            <img
+              src={p.image}
+              loading="lazy"
+              width="300"
+              height="300"
+              className="h-28 sm:h-40 mx-auto object-contain"
+            />
 
             <h3 className="mt-3 sm:mt-4 text-xs sm:text-sm">{p.name}</h3>
 

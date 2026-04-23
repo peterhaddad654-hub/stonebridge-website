@@ -200,7 +200,7 @@ export default function AdminProducts() {
                 <td className="px-5 py-4">
                   <div className="w-12 h-12 border border-[#E5E5EA] bg-white flex items-center justify-center">
                     {product.image ? (
-                      <img src={product.image} alt="" className="w-full h-full object-contain p-1" />
+                      <img src={product.image} alt="" loading="lazy" className="w-full h-full object-contain p-1" />
                     ) : (
                       <span className="font-body text-[10px] text-[#8E8E93]">N/A</span>
                     )}
@@ -261,7 +261,7 @@ export default function AdminProducts() {
                 <div className="relative">
                   {imagePreview ? (
                     <div className="border-2 border-dashed border-[#E5E5EA] h-[200px] flex items-center justify-center bg-[#FAFAFA]">
-                      <img src={imagePreview} alt="Preview" className="max-h-full max-w-full object-contain p-4" />
+                      <img src={imagePreview} alt="Preview" loading="lazy" className="max-h-full max-w-full object-contain p-4" />
                     </div>
                   ) : (
                     <label className="border-2 border-dashed border-[#E5E5EA] h-[200px] flex flex-col items-center justify-center cursor-pointer hover:border-[#D4AF37] hover:bg-[rgba(212,175,55,0.03)] transition-colors">
@@ -363,7 +363,7 @@ export default function AdminProducts() {
             <div className="p-6">
               {viewProduct.image && (
                 <div className="w-full h-[200px] bg-white flex items-center justify-center mb-4 border border-[#E5E5EA]">
-                  <img src={viewProduct.image} alt={viewProduct.name} className="max-h-full max-w-full object-contain" />
+                  <img src={viewProduct.image} alt={viewProduct.name} loading="lazy" className="max-h-full max-w-full object-contain" />
                 </div>
               )}
               <h4 className="font-display text-xl font-medium text-[#1C1C1E]">{viewProduct.name}</h4>

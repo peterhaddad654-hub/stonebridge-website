@@ -6,6 +6,9 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  limit,
+  orderBy,
+  query,
 } from 'firebase/firestore';
 
 // ===================================================
@@ -14,9 +17,18 @@ import {
 
 export const getProducts = async () => {
   try {
+    // Removed strict pagination, limits, and specific ordering 
+    // to ensure all ~300 documents are fetched.
     const snap = await getDocs(collection(db, 'products'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    const data = snap.docs.map(d => ({ 
+      id: d.id, 
+      ...d.data() 
+    }));
+
+    return data;
   } catch (err) {
+    // If there is a permission or connection error, we see it now
     console.error('getProducts error:', err);
     return [];
   }

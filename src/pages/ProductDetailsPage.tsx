@@ -101,7 +101,7 @@ export default function ProductDetailsPage() {
         <div className="relative w-full aspect-[4/5] bg-[#111] border border-white/5 overflow-hidden transition-all duration-500 group-hover:border-white/20">
           <div className={`absolute inset-0 flex items-center justify-center ${isRecent ? 'p-3' : 'p-6'}`}>
             {item.image ? (
-              <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" />
+              <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" />
             ) : (
               <div className="text-gray-600 text-[8px] uppercase tracking-widest text-center">No Image</div>
             )}
@@ -126,7 +126,7 @@ export default function ProductDetailsPage() {
         <div className="grid md:grid-cols-2 gap-12 mt-10 items-start">
           <div className="relative w-full aspect-square md:aspect-[4/5] bg-[#111] border border-white/10 overflow-hidden flex items-center justify-center p-8">
             {product.image && product.image.trim() !== '' ? (
-              <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+              <img src={product.image} alt={product.name} loading="lazy" className="w-full h-full object-contain" />
             ) : (
               <div className="text-gray-500 text-sm">No Image Available</div>
             )}

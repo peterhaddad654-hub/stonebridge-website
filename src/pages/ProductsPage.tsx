@@ -4,26 +4,55 @@ import { useCart } from '../contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Check, Search, ChevronDown, X } from 'lucide-react';
 
+const sortOptions = [
+  { id: 'featured', label: 'Featured' },
+  { id: 'low', label: 'Price: Low-High' },
+  { id: 'high', label: 'Price: High-Low' },
+];
+
+const ProductSkeleton = () => (
+  <div className="flex flex-col animate-pulse">
+    <div className="relative aspect-[4/5] w-full bg-white/5 rounded-[2rem] mb-4" />
+    <div className="px-1">
+      <div className="h-2 w-16 bg-white/10 rounded mb-2" />
+      <div className="h-3 w-full bg-white/10 rounded mb-4" />
+      <div className="h-10 w-full bg-white/5 rounded-xl" />
+    </div>
+  </div>
+);
+
 export default function ProductsPage() {
-  const { products, categories, loading } = useData();
+  const { products, categories, loading, isInitialLoadComplete } = useData();
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  // State Management
   const [activeCategory, setActiveCategory] = useState('All Products');
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
   
-  // Ref for clicking outside the sort dropdown
   const sortRef = useRef<HTMLDivElement>(null);
 
-  const sortOptions = [
-    { id: 'featured', label: 'Featured' },
-    { id: 'low', label: 'Price: Low-High' },
-    { id: 'high', label: 'Price: High-Low' },
-  ];
+  const sortedCategories = useMemo(() => {
+    if (!categories || !products) return [];
+    const counts: Record<string, number> = {};
+    categories.forEach((cat: any) => {
+      const name = typeof cat === 'string' ? cat : cat?.name;
+      counts[name] = 0;
+    });
+    products.forEach((p: any) => {
+      const pCat = typeof p.category === 'string' ? p.category : p.category?.name;
+      if (pCat && counts[pCat] !== undefined) {
+        counts[pCat]++;
+      }
+    });
+    return [...categories].sort((a: any, b: any) => {
+      const nameA = typeof a === 'string' ? a : a?.name;
+      const nameB = typeof b === 'string' ? b : b?.name;
+      return (counts[nameB] || 0) - (counts[nameA] || 0);
+    });
+  }, [categories, products]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -35,51 +64,30 @@ export default function ProductsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  /**
-   * REFINED FILTERING LOGIC
-   * 1. Start with full products array
-   * 2. Apply search (if exists)
-   * 3. Apply category (if not "All")
-   * 4. Apply sorting
-   */
   const displayedProducts = useMemo(() => {
-    // 1. Initial Source
     let filtered = products ? [...products] : [];
-
-    // 2. Search Filter
     if (search.trim().length > 0) {
       const query = search.toLowerCase();
       filtered = filtered.filter((p: any) => 
         p.name?.toLowerCase().includes(query) || 
-        p.category?.toLowerCase().includes(query)
+        (typeof p.category === 'string' ? p.category : p.category?.name)?.toLowerCase().includes(query)
       );
     }
-
-    // 3. Category Filter
     if (activeCategory !== 'All Products') {
       filtered = filtered.filter((p: any) => {
         const pCategory = typeof p.category === 'string' ? p.category : p.category?.name;
         return pCategory === activeCategory;
       });
     }
-
-    // 4. Sorting
-    if (sortBy === 'low') {
-      filtered.sort((a, b) => Number(a.price) - Number(b.price));
-    } else if (sortBy === 'high') {
-      filtered.sort((a, b) => Number(b.price) - Number(a.price));
-    }
-
+    if (sortBy === 'low') filtered.sort((a, b) => Number(a.price) - Number(b.price));
+    else if (sortBy === 'high') filtered.sort((a, b) => Number(b.price) - Number(a.price));
     return filtered;
   }, [products, activeCategory, search, sortBy]);
 
-  // Search suggestions logic
   const suggestions = useMemo(() => {
     if (!search.trim()) return [];
     const q = search.toLowerCase();
-    return (products || []).filter((p: any) => 
-      p.name?.toLowerCase().includes(q)
-    ).slice(0, 5);
+    return (products || []).filter((p: any) => p.name?.toLowerCase().includes(q)).slice(0, 5);
   }, [products, search]);
 
   const handleAdd = (e: React.MouseEvent, product: any) => {
@@ -92,12 +100,33 @@ export default function ProductsPage() {
 
   return (
     <div className="bg-[#0F0F10] text-white min-h-screen pb-20 selection:bg-[#D4AF37]/30">
+      {/* THICKER SCROLLBAR STYLES */}
       <style>{`
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scroll { 
+          overflow-x: auto;
+          scroll-behavior: smooth;
+          /* Added padding bottom to keep scrollbar away from buttons */
+          padding-bottom: 12px;
+        }
+        /* Increased height to 6px for easier clicking */
+        .custom-scroll::-webkit-scrollbar {
+          height: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 20px;
+        }
+        /* More visible gold color and rounded ends */
+        .custom-scroll::-webkit-scrollbar-thumb {
+          background: rgba(212, 175, 55, 0.3);
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+          background: rgba(212, 175, 55, 0.6);
+        }
       `}</style>
 
-      {/* HEADER SECTION */}
       <div className="max-w-[1344px] mx-auto px-4 pt-24 md:pt-32">
         <div className="flex flex-col gap-6 mb-8">
           <h1 className="text-2xl md:text-3xl font-display uppercase tracking-widest border-l-2 border-[#D4AF37] pl-4">
@@ -105,7 +134,6 @@ export default function ProductsPage() {
           </h1>
 
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            {/* SEARCH BAR */}
             <div className="relative w-full md:w-80">
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-[#D4AF37] transition-colors" size={14} />
@@ -122,7 +150,6 @@ export default function ProductsPage() {
                 )}
               </div>
               
-              {/* SUGGESTIONS DROPDOWN */}
               {suggestions.length > 0 && (
                 <div className="absolute top-full left-0 w-full mt-2 bg-[#161617] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-[110] backdrop-blur-xl">
                   {suggestions.map((p: any) => (
@@ -131,7 +158,7 @@ export default function ProductsPage() {
                       onClick={() => { navigate(`/product/${p.id}`); setSearch(''); }}
                       className="w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 text-left"
                     >
-                      <img src={p.image} alt="" className="w-8 h-8 object-contain shrink-0" />
+                      <img src={p.image} alt="" loading="lazy" className="w-8 h-8 object-contain shrink-0" />
                       <div className="flex flex-col overflow-hidden">
                         <span className="text-[10px] font-medium text-white/90 truncate">{p.name}</span>
                         <span className="text-[9px] text-[#D4AF37] font-bold">${p.price}</span>
@@ -142,7 +169,6 @@ export default function ProductsPage() {
               )}
             </div>
 
-            {/* SORT DROPDOWN */}
             <div className="relative w-full md:w-auto" ref={sortRef}>
               <button 
                 onClick={() => setIsSortOpen(!isSortOpen)}
@@ -170,9 +196,8 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* CATEGORIES SCROLL */}
-          <div className="flex gap-2 overflow-x-auto hide-scrollbar w-full py-2">
-            {['All Products', ...categories].map((cat: any, index: number) => {
+          <div className="flex gap-2 custom-scroll w-full mt-2">
+            {['All Products', ...sortedCategories].map((cat: any, index: number) => {
               const name = typeof cat === 'string' ? cat : cat?.name;
               const isActive = activeCategory === name;
               return (
@@ -193,13 +218,10 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* PRODUCTS GRID SECTION */}
       <div className="max-w-[1344px] mx-auto px-4">
-        {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse bg-white/5 rounded-[2rem] h-[350px]" />
-            ))}
+        {loading && products.length === 0 ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12">
+            {[...Array(8)].map((_, i) => <ProductSkeleton key={i} />)}
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12">
@@ -207,15 +229,16 @@ export default function ProductsPage() {
               const isAdded = added === product.id;
               return (
                 <Link to={`/product/${product.id}`} key={product.id} className="group flex flex-col">
-                  
-                  {/* PRODUCT IMAGE CONTAINER */}
                   <div className="relative aspect-[4/5] w-full bg-[#121212] border border-white/5 rounded-[2rem] overflow-hidden mb-4 transition-all duration-500 group-hover:border-[#D4AF37]/30">
                     <div className="absolute inset-0 flex items-center justify-center p-3 transition-transform duration-700 group-hover:scale-110">
                       <img 
                         src={product.image} 
                         alt={product.name} 
-                        className="w-full h-[88%] object-contain brightness-[1.05] contrast-[1.1] saturate-[1.1]" 
+                        loading="lazy"
+                        className="w-full h-[88%] object-contain transition-opacity duration-700 brightness-[1.05] contrast-[1.1] saturate-[1.1]" 
+                        onLoad={(e) => (e.currentTarget.style.opacity = "1")}
                         style={{ 
+                          opacity: 0,
                           imageRendering: 'auto',
                           WebkitBackfaceVisibility: 'hidden',
                           transform: 'translateZ(0)'
@@ -225,25 +248,21 @@ export default function ProductsPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                   </div>
 
-                  {/* PRODUCT INFO */}
                   <div className="flex flex-col flex-1 px-1">
                     <span className="text-[9px] text-[#D4AF37] uppercase tracking-widest font-bold mb-1">
                       {typeof product.category === 'string' ? product.category : product.category?.name}
                     </span>
-                    
                     <div className="min-h-[2.5rem] mb-1">
                       <h3 className="text-[11px] font-medium uppercase tracking-wider text-white/90 leading-tight">
                         {product.name}
                       </h3>
                     </div>
-
                     <div className="flex items-baseline gap-2 mb-4">
                       <span className="text-sm font-bold text-[#D4AF37]">${product.price}</span>
                       {product.oldPrice && (
                         <span className="text-[10px] text-white/20 line-through">${product.oldPrice}</span>
                       )}
                     </div>
-
                     <button
                       disabled={product.status === 'out-of-stock'}
                       onClick={(e) => handleAdd(e, product)}
@@ -260,11 +279,20 @@ export default function ProductsPage() {
                 </Link>
               );
             })}
+            
+            {!isInitialLoadComplete && (
+              <>
+                {[...Array(4)].map((_, i) => <ProductSkeleton key={`more-${i}`} />)}
+                <div className="col-span-full py-10 flex flex-col items-center gap-4">
+                  <div className="w-6 h-6 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin" />
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#D4AF37]/60 animate-pulse">Syncing Collection...</p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* Empty State */}
-        {!loading && displayedProducts.length === 0 && (
+        {isInitialLoadComplete && displayedProducts.length === 0 && (
           <div className="py-20 text-center">
             <p className="text-white/40 uppercase tracking-widest text-xs">No products found matching your criteria.</p>
             <button 

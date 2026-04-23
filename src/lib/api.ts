@@ -18,6 +18,9 @@ import {
   doc,
   orderBy,
   query,
+  getCountFromServer,
+  limit,
+  where,
 } from 'firebase/firestore';
 
 // ─────────────────────────────
@@ -26,7 +29,8 @@ import {
 
 export const getProducts = async (): Promise<Product[]> => {
   try {
-    const q = query(collection(db, 'products'), orderBy('created_at', 'desc'));
+    // Never fetch full products collection. Always paginate.
+    const q = query(collection(db, 'products'), orderBy('created_at', 'desc'), limit(24));
     const snap = await getDocs(q);
 
     return snap.docs.map((d) => ({
@@ -261,22 +265,24 @@ export const updateSettings = async (
 
 export const getStats = async () => {
   try {
-    const [p, c, m] = await Promise.all([
-      getDocs(collection(db, 'products')),
+    const [pCount, inStockCount, limitedCount, outOfStockCount, c, m] = await Promise.all([
+      getCountFromServer(collection(db, 'products')),
+      getCountFromServer(query(collection(db, 'products'), where('status', '==', 'in-stock'))),
+      getCountFromServer(query(collection(db, 'products'), where('status', '==', 'limited'))),
+      getCountFromServer(query(collection(db, 'products'), where('status', '==', 'out-of-stock'))),
       getDocs(collection(db, 'categories')),
       getDocs(collection(db, 'messages')),
     ]);
 
-    const products = p.docs.map((d) => d.data() as any);
     const messages = m.docs.map((d) => d.data() as any);
 
     return {
-      totalProducts: products.length,
+      totalProducts: pCount.data().count,
       totalCategories: c.size,
       newMessages: messages.filter((x) => x.status === 'new').length,
-      inStockProducts: products.filter((x) => x.status === 'in-stock').length,
-      limitedProducts: products.filter((x) => x.status === 'limited').length,
-      outOfStockProducts: products.filter((x) => x.status === 'out-of-stock').length,
+      inStockProducts: inStockCount.data().count,
+      limitedProducts: limitedCount.data().count,
+      outOfStockProducts: outOfStockCount.data().count,
     };
   } catch {
     return {
