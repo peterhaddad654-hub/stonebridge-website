@@ -14,7 +14,7 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState('featured');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [added, setAdded] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [visibleCount, setVisibleCount] = useState(24); 
 
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -34,24 +34,34 @@ export default function ProductsPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filtered = useMemo(() => {
-    let result = [...(products || [])];
+  const displayedProducts = useMemo(() => {
+    let result = products ? [...products] : [];
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((p: any) => 
+        p.name?.toLowerCase().includes(q) || 
+        p.category?.toLowerCase().includes(q)
+      );
+    }
+
     if (activeCategory !== 'All Products') {
       result = result.filter((p: any) => p.category === activeCategory);
     }
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter((p: any) => p.name?.toLowerCase().includes(q));
+
+    if (sortBy === 'low') {
+      result.sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortBy === 'high') {
+      result.sort((a, b) => Number(b.price) - Number(a.price));
     }
-    if (sortBy === 'low') result.sort((a, b) => a.price - b.price);
-    else if (sortBy === 'high') result.sort((a, b) => b.price - a.price);
+
     return result;
   }, [products, activeCategory, search, sortBy]);
 
   const suggestions = useMemo(() => {
     if (!search.trim()) return [];
     const q = search.toLowerCase();
-    return products.filter((p: any) => p.name?.toLowerCase().includes(q)).slice(0, 5);
+    return (products || []).filter((p: any) => p.name?.toLowerCase().includes(q)).slice(0, 5);
   }, [products, search]);
 
   const handleAdd = (e: React.MouseEvent, product: any) => {
@@ -94,7 +104,6 @@ export default function ProductsPage() {
                 )}
               </div>
               
-              {/* SUGGESTIONS */}
               {suggestions.length > 0 && (
                 <div className="absolute top-full left-0 w-full mt-2 bg-[#161617] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-[110] backdrop-blur-xl">
                   {suggestions.map((p: any) => (
@@ -114,7 +123,7 @@ export default function ProductsPage() {
               )}
             </div>
 
-            {/* SORT DROPDOWN */}
+            {/* SORT */}
             <div className="relative w-full md:w-auto" ref={sortRef}>
               <button 
                 onClick={() => setIsSortOpen(!isSortOpen)}
@@ -142,7 +151,7 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* CATEGORY BUBBLES */}
+          {/* CATEGORIES */}
           <div className="flex gap-2 overflow-x-auto hide-scrollbar w-full py-2">
             {['All Products', ...categories].map((cat: any, index: number) => {
               const name = typeof cat === 'string' ? cat : cat?.name;
@@ -165,7 +174,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* GRID */}
+      {/* PRODUCTS GRID */}
       <div className="max-w-[1344px] mx-auto px-4">
         {loading ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -173,15 +182,27 @@ export default function ProductsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-12">
-            {filtered.slice(0, visibleCount).map((product: any) => {
+            {displayedProducts.slice(0, visibleCount).map((product: any) => {
               const isAdded = added === product.id;
               return (
                 <Link to={`/product/${product.id}`} key={product.id} className="group flex flex-col">
-                  {/* IMAGE */}
-                  <div className="relative aspect-[4/5] bg-[#121212] border border-white/5 rounded-[2rem] overflow-hidden mb-4 transition-all duration-500 group-hover:border-[#D4AF37]/30">
-                    <div className="w-full h-full flex items-center justify-center p-6 transition-transform duration-700 group-hover:scale-125">
-                      <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                  
+                  {/* IMPROVED IMAGE BOX */}
+                  <div className="relative aspect-[4/5] w-full bg-[#121212] border border-white/5 rounded-[2rem] overflow-hidden mb-4 transition-all duration-500 group-hover:border-[#D4AF37]/30">
+                    <div className="absolute inset-0 flex items-center justify-center p-3 transition-transform duration-700 group-hover:scale-110">
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-[88%] object-contain brightness-[1.05] contrast-[1.1] saturate-[1.1]" 
+                        style={{ 
+                          imageRendering: 'auto',
+                          WebkitBackfaceVisibility: 'hidden',
+                          transform: 'translateZ(0)'
+                        }}
+                      />
                     </div>
+                    {/* Visual grounding shadow */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                   </div>
 
                   <div className="flex flex-col flex-1 px-1">
@@ -196,7 +217,6 @@ export default function ProductsPage() {
                       {product.oldPrice && <span className="text-[10px] text-white/20 line-through">${product.oldPrice}</span>}
                     </div>
 
-                    {/* BUTTON - REVERTED TO "ADD" */}
                     <button
                       disabled={product.status === 'out-of-stock'}
                       onClick={(e) => handleAdd(e, product)}
